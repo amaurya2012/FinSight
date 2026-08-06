@@ -31,6 +31,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong on the server' });
 });
 
-app.listen(PORT, () => {
-  console.log(`FinSight backend running on http://localhost:${PORT}`);
-});
+// Only start a normal listening server when running locally.
+// On Vercel, the exported `app` is wrapped and invoked per-request instead.
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`FinSight backend running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
