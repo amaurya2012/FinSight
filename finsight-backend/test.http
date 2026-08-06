@@ -1,0 +1,89 @@
+### Transaction 1 - June
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00
+
+{
+  "description": "Swiggy dinner order",
+  "amount": 450,
+  "transaction_date": "2026-08-05"
+}
+
+### Transaction 2 - June
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00
+
+{
+  "description": "Monthly rent payment",
+  "amount": 15000,
+  "transaction_date": "2026-06-01"
+}
+
+### Transaction 3 - June
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00
+
+{
+  "description": "Zomato lunch order",
+  "amount": 350,
+  "transaction_date": "2026-06-10"
+}
+
+### Transaction 4 - July
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00
+
+{
+  "description": "Monthly rent payment",
+  "amount": 15000,
+  "transaction_date": "2026-07-01"
+}
+
+### Transaction 5 - July
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00
+
+{
+  "description": "Amazon shopping",
+  "amount": 2500,
+  "transaction_date": "2026-07-12"
+}
+
+### Transaction 6 - July (anomaly test)
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00
+
+{
+  "description": "Emergency laptop repair",
+  "amount": 18000,
+  "transaction_date": "2026-07-20"
+}
+
+### Transaction 7 - August
+POST http://localhost:5000/api/transactions
+Content-Type: application/json
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00
+
+{
+  "description": "Netflix subscription",
+  "amount": 500,
+  "transaction_date": "2026-08-01"
+}
+
+
+### Get Spend Trend
+GET http://localhost:5000/api/analytics/trend
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00
+
+### Get Next Month Prediction
+GET http://localhost:5000/api/analytics/prediction
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00
+
+### Get Anomalies
+GET http://localhost:5000/api/analytics/anomalies
+x-user-id: 9cc45ccc-b2d1-4207-8b01-cec802e67c00

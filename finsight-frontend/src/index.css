@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-bg: #0b1220;
+  --color-navy-surface: #131b2e;
+  --color-accent-mint: #34d399;
+  --color-accent-coral: #f87171;
+  --color-accent-gold: #f5b942;
+
+  --font-serif: 'Fraunces', serif;
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Default Dark Mode Variables */
+:root {
+  --bg-main: #10151f;
+  --bg-surface: #131b2e;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border-color: #1e293b;
+}
+
+/* Light Mode Variables - Crisp & High Contrast */
+html.light-mode {
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #1e293b;
+  --border-color: #cbd5e1;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Global Light Mode Overrides for unified clean surface */
+html.light-mode aside,
+html.light-mode div[class*="bg-[#131b2e]"],
+html.light-mode .card-surface {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html.light-mode input,
+html.light-mode select {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Comprehensive Sharp Text Fix for Light Mode */
+html.light-mode {
+  color: #0f172a !important;
+}
+
+html.light-mode p, 
+html.light-mode span, 
+html.light-mode div, 
+html.light-mode label,
+html.light-mode small {
+  color: #1e293b !important;
+}
+
+html.light-mode .text-slate-300,
+html.light-mode .text-slate-400,
+html.light-mode .text-slate-500 {
+  color: #334155 !important; /* High contrast crisp slate for subtitles and dates */
+}
+
+html.light-mode h1, 
+html.light-mode h2, 
+html.light-mode h3, 
+html.light-mode h4,
+html.light-mode strong {
+  color: #020617 !important; /* Pure bold dark text for headings and numbers */
+}
