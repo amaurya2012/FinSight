@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function Transactions({ transactions, onAddTransaction }) {
+export default function Transactions({ transactions, onAddTransaction, onDeleteTransaction }) {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,15 +16,15 @@ export default function Transactions({ transactions, onAddTransaction }) {
     if (!newTitle.trim() || !newAmount.trim()) return;
 
     const numericAmount = Number(newAmount);
-    const currentDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    // ISO date (YYYY-MM-DD) so the backend can parse it reliably
+    const isoDate = new Date().toISOString().split('T')[0];
 
     const newTx = {
-      id: Date.now(),
       title: newTitle,
       category: newCategory,
       account: newAccount,
-      date: currentDate,
-      amount: newType === 'Income' ? numericAmount : -numericAmount,
+      date: isoDate,
+      amount: numericAmount,
       type: newType,
     };
 
@@ -32,6 +32,12 @@ export default function Transactions({ transactions, onAddTransaction }) {
     setNewTitle('');
     setNewAmount('');
     setIsModalOpen(false);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Delete this transaction?')) {
+      onDeleteTransaction(id);
+    }
   };
 
   const filteredData = transactions.filter(tx => {
@@ -99,6 +105,7 @@ export default function Transactions({ transactions, onAddTransaction }) {
                 <th className="pb-3 font-medium">ACCOUNT</th>
                 <th className="pb-3 font-medium">DATE</th>
                 <th className="pb-3 font-medium text-right">AMOUNT</th>
+                <th className="pb-3 font-medium text-right">ACTION</th>
               </tr>
             </thead>
             <tbody className="divide-y" style={{ borderColor: 'var(--border-color)' }}>
@@ -115,8 +122,25 @@ export default function Transactions({ transactions, onAddTransaction }) {
                   <td className={`py-4 text-right font-bold ${tx.type === 'Income' ? 'text-[#34d399]' : ''}`} style={{ color: tx.type === 'Income' ? undefined : 'var(--text-main)' }}>
                     {tx.type === 'Income' ? '+' : '-'}₹{Math.abs(tx.amount).toLocaleString('en-IN')}.00
                   </td>
+                  <td className="py-4 text-right">
+                    <button
+                      onClick={() => handleDelete(tx.id)}
+                      className="w-7 h-7 rounded-lg border cursor-pointer text-[#f87171] hover:bg-[#f87171]/10 transition-colors"
+                      style={{ borderColor: 'var(--border-color)' }}
+                      title="Delete transaction"
+                    >
+                      🗑
+                    </button>
+                  </td>
                 </tr>
               ))}
+              {filteredData.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="py-6 text-center" style={{ color: 'var(--text-muted)' }}>
+                    No transactions found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -167,7 +191,7 @@ export default function Transactions({ transactions, onAddTransaction }) {
                   </select>
                 </div>
                 <div>
-                  <label className="block mb-1" style={{ color: 'var(--text-muted)' }}>Category</label>
+                  <label className="block mb-1" style={{ color: 'var(--text-muted)' }}>Category (suggestion)</label>
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
@@ -211,6 +235,10 @@ export default function Transactions({ transactions, onAddTransaction }) {
                   />
                 </div>
               </div>
+
+              <p className="text-[10px] italic" style={{ color: 'var(--text-muted)' }}>
+                Note: The final category shown may be auto-corrected by the ML categorization model based on the transaction title.
+              </p>
 
               <div className="pt-2 flex justify-end gap-2">
                 <button

@@ -9,36 +9,50 @@ import Transactions from './components/Transactions';
 import Budgets from './components/Budgets';
 import Insights from './components/Insights';
 import AIChatModel from './components/AIChatModel';
+import { fetchTransactions, createTransaction, deleteTransaction } from './api/transactions';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [transactionsList, setTransactionsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Load initial transactions from localStorage if available, otherwise use default list
-  const [transactionsList, setTransactionsList] = useState(() => {
-    const saved = localStorage.getItem('finsight_transactions');
-    if (saved) {
+  // Load transactions from the backend on mount
+  useEffect(() => {
+    async function loadTransactions() {
       try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Failed to parse local storage transactions", e);
+        setLoading(true);
+        const data = await fetchTransactions();
+        setTransactionsList(data);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to load transactions:', err);
+        setError('Could not load transactions. Is the backend running?');
+      } finally {
+        setLoading(false);
       }
     }
-    return [
-      { id: 1, title: 'Cloud Infrastructure (AWS)', category: 'Subscription', account: 'Business HDFC', date: '05 Aug, 2026', amount: -2499, type: 'Expense' },
-      { id: 2, title: 'Client Freelance Payout', category: 'Income', account: 'Primary Bank', date: '03 Aug, 2026', amount: 25000, type: 'Income' },
-      { id: 3, title: 'Local Cafe & Workspace', category: 'Food', account: 'UPI Wallet', date: '01 Aug, 2026', amount: -450, type: 'Expense' },
-      { id: 4, title: 'GitHub Enterprise Subscription', category: 'Subscription', account: 'Credit Card', date: '28 Jul, 2026', amount: -349, type: 'Expense' },
-      { id: 5, title: 'UI/UX Design Kit Purchase', category: 'Design', account: 'Business HDFC', date: '25 Jul, 2026', amount: -1200, type: 'Expense' },
-    ];
-  });
+    loadTransactions();
+  }, []);
 
-  // Save transactions to localStorage whenever the list updates
-  useEffect(() => {
-    localStorage.setItem('finsight_transactions', JSON.stringify(transactionsList));
-  }, [transactionsList]);
+  const addTransaction = async (newTx) => {
+    try {
+      const saved = await createTransaction(newTx);
+      setTransactionsList([saved, ...transactionsList]);
+    } catch (err) {
+      console.error('Failed to add transaction:', err);
+      setError('Could not save transaction. Please try again.');
+    }
+  };
 
-  const addTransaction = (newTx) => {
-    setTransactionsList([newTx, ...transactionsList]);
+  const removeTransaction = async (id) => {
+    try {
+      await deleteTransaction(id);
+      setTransactionsList(transactionsList.filter(tx => tx.id !== id));
+    } catch (err) {
+      console.error('Failed to delete transaction:', err);
+      setError('Could not delete transaction. Please try again.');
+    }
   };
 
   return (
@@ -46,7 +60,7 @@ export default function App() {
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <header 
+        <header
           className="h-20 border-b flex items-center justify-between px-8 shrink-0 transition-colors"
           style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-color)' }}
         >
@@ -68,10 +82,21 @@ export default function App() {
         </header>
 
         <main className="flex-1 overflow-y-auto p-8">
-          {activeTab === 'dashboard' && <Dashboard transactions={transactionsList} />}
-          {activeTab === 'transactions' && <Transactions transactions={transactionsList} onAddTransaction={addTransaction} />}
-          {activeTab === 'budgets' && <Budgets />}
-          {activeTab === 'insights' && <Insights />}
+          {error && (
+            <div className="mb-4 p-3 rounded-xl border text-xs font-mono text-[#f87171] border-[#f87171]/30 bg-[#f87171]/10">
+              {error}
+            </div>
+          )}
+          {loading ? (
+            <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>Loading transactions...</p>
+          ) : (
+            <>
+              {activeTab === 'dashboard' && <Dashboard transactions={transactionsList} />}
+              {activeTab === 'transactions' && <Transactions transactions={transactionsList} onAddTransaction={addTransaction} onDeleteTransaction={removeTransaction} />}
+              {activeTab === 'budgets' && <Budgets />}
+              {activeTab === 'insights' && <Insights />}
+            </>
+          )}
         </main>
       </div>
 
