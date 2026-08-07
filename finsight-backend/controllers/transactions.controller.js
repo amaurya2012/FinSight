@@ -28,10 +28,11 @@ async function getTransactions(req, res) {
   res.json(data);
 }
 
-// POST create a transaction (auto-categorizes via FastAPI if no category given)
+// POST create a transaction (auto-categorizes via FastAPI, but stores the
+// user's manually selected category separately so it can take priority)
 async function createTransaction(req, res) {
   const userId = req.headers['x-user-id'];
-  const { description, amount, transaction_type, transaction_date, category_id } = req.body;
+  const { description, amount, transaction_type, transaction_date, category_id, category } = req.body;
 
   if (!userId || !description || !amount || !transaction_date) {
     return res.status(400).json({ error: 'description, amount, and transaction_date are required' });
@@ -39,17 +40,16 @@ async function createTransaction(req, res) {
 
   let predictedCategory = null;
 
-  // If user didn't manually pick a category, ask the ML service to predict one
-  if (!category_id) {
-    try {
-      const response = await axios.post(`${FASTAPI_URL}/predict-category`, {
-        description
-      });
-      predictedCategory = response.data.predicted_category;
-    } catch (err) {
-      console.error('FastAPI categorization failed:', err.message);
-      // Not fatal - transaction can still be saved without a predicted category
-    }
+  // ML categorization still runs every time (useful for analytics/insights),
+  // but it no longer overrides what the user picked in the form.
+  try {
+    const response = await axios.post(`${FASTAPI_URL}/predict-category`, {
+      description
+    });
+    predictedCategory = response.data.predicted_category;
+  } catch (err) {
+    console.error('FastAPI categorization failed:', err.message);
+    // Not fatal - transaction can still be saved without a predicted category
   }
 
   const { data, error } = await supabase
@@ -57,6 +57,7 @@ async function createTransaction(req, res) {
     .insert([{
       user_id: userId,
       category_id: category_id || null,
+      manual_category: category || null,
       amount,
       description,
       transaction_type: transaction_type || 'expense',

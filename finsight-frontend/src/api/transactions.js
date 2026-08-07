@@ -9,7 +9,8 @@ function transformTransaction(tx) {
   return {
     id: tx.id,
     title: tx.description,
-    category: tx.predicted_category || 'Uncategorized',
+    category: tx.manual_category || 'Other',
+    predictedCategory: tx.predicted_category || null, // kept for Insights/ML display elsewhere
     account: 'Linked Account', // backend doesn't track multiple accounts yet
     date: new Date(tx.transaction_date).toLocaleDateString('en-IN', {
       day: '2-digit', month: 'short', year: 'numeric'
@@ -51,7 +52,8 @@ export async function createTransaction(newTx) {
       description: newTx.title,
       amount: Math.abs(newTx.amount),
       transaction_type: newTx.type === 'Income' ? 'income' : 'expense',
-      transaction_date: newTx.date || new Date().toISOString().split('T')[0]
+      transaction_date: newTx.date || new Date().toISOString().split('T')[0],
+      category: newTx.category || null
     })
   });
   if (!res.ok) throw new Error('Failed to create transaction');
