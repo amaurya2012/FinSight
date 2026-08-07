@@ -16,7 +16,7 @@ export async function deleteBudget(id) {
   if (!res.ok) throw new Error('Failed to delete budget');
   return true;
 }
-{
+export async function createBudget({ category_id, monthly_limit, month, year }) {
   const res = await fetch(`${API_URL}/api/budgets`, {
     method: 'POST',
     headers: {
