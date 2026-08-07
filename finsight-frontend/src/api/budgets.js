@@ -8,7 +8,15 @@ export async function fetchBudgets(month, year) {
   return res.json();
 }
 
-export async function createBudget({ category_id, monthly_limit, month, year }) {
+export async function deleteBudget(id) {
+  const res = await fetch(`${API_URL}/api/budgets/${id}`, {
+    method: 'DELETE',
+    headers: { 'x-user-id': TEMP_USER_ID }
+  });
+  if (!res.ok) throw new Error('Failed to delete budget');
+  return true;
+}
+{
   const res = await fetch(`${API_URL}/api/budgets`, {
     method: 'POST',
     headers: {

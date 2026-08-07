@@ -59,4 +59,19 @@ async function updateBudget(req, res) {
   res.json(data[0]);
 }
 
-module.exports = { getBudgets, createBudget, updateBudget };
+// DELETE a budget
+async function deleteBudget(req, res) {
+  const { id } = req.params;
+  const userId = req.headers['x-user-id'];
+
+  const { error } = await supabase
+    .from('finsight_budgets')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', userId);
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(204).send();
+}
+
+module.exports = { getBudgets, createBudget, updateBudget, deleteBudget };

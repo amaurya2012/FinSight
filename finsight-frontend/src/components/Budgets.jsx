@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { fetchBudgets, createBudget } from '../api/budgets';
+import { fetchBudgets, createBudget, deleteBudget } from '../api/budgets';
 import { findOrCreateCategoryId } from '../api/categories';
 import { fetchTransactions } from '../api/transactions';
 
-const CATEGORY_OPTIONS = ['Food', 'Rent', 'Shopping', 'Bills', 'Transport', 'Entertainment', 'Healthcare', 'Subscription', 'Other'];
+const CATEGORY_OPTIONS = ['Food', 'Rent', 'Shopping', 'Bills', 'Transport', 'Entertainment', 'Healthcare', 'Subscription', 'Utilities', 'Other'];
 
 const now = new Date();
 const CURRENT_MONTH = now.getMonth() + 1;
@@ -62,6 +62,17 @@ export default function Budgets() {
       setError('Could not save budget. Please try again.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteBudget = async (id) => {
+    if (!window.confirm('Delete this budget?')) return;
+    try {
+      await deleteBudget(id);
+      setBudgets(budgets.filter(b => b.id !== id));
+    } catch (err) {
+      console.error('Failed to delete budget:', err);
+      setError('Could not delete budget. Please try again.');
     }
   };
 
@@ -132,11 +143,21 @@ export default function Budgets() {
                 <div>
                   <div className="flex justify-between items-center mb-3">
                     <h5 className="font-serif font-bold text-sm" style={{ color: 'var(--text-main)' }}>{item.category}</h5>
-                    <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-mono font-bold ${
-                      item.isOver ? 'bg-[#f87171]/10 text-[#f87171] border-[#f87171]/30' : 'bg-[#34d399]/10 text-[#34d399] border-[#34d399]/30'
-                    }`}>
-                      {item.isOver ? 'Over Budget' : 'On Track'}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-mono font-bold ${
+                        item.isOver ? 'bg-[#f87171]/10 text-[#f87171] border-[#f87171]/30' : 'bg-[#34d399]/10 text-[#34d399] border-[#34d399]/30'
+                      }`}>
+                        {item.isOver ? 'Over Budget' : 'On Track'}
+                      </span>
+                      <button
+                        onClick={() => handleDeleteBudget(item.id)}
+                        className="w-6 h-6 rounded-lg border cursor-pointer text-[#f87171] hover:bg-[#f87171]/10 transition-colors text-xs shrink-0"
+                        style={{ borderColor: 'var(--border-color)' }}
+                        title="Delete budget"
+                      >
+                        🗑
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex justify-between items-center text-xs font-mono mb-2" style={{ color: 'var(--text-muted)' }}>
