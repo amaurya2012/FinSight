@@ -9,7 +9,7 @@ function transformTransaction(tx) {
   return {
     id: tx.id,
     title: tx.description,
-    category: tx.manual_category || 'Other',
+    category: tx.manual_category || tx.predicted_category || 'Other',
     predictedCategory: tx.predicted_category || null, // kept for Insights/ML display elsewhere
     account: 'Linked Account', // backend doesn't track multiple accounts yet
     date: new Date(tx.transaction_date).toLocaleDateString('en-IN', {
