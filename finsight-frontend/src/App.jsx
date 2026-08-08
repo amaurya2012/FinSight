@@ -9,12 +9,9 @@ import Transactions from './components/Transactions';
 import Budgets from './components/Budgets';
 import Insights from './components/Insights';
 import AIChatModel from './components/AIChatModel';
-import Login from './components/Login';
-import { useAuth } from './context/AuthContext';
 import { fetchTransactions, createTransaction, deleteTransaction } from './api/transactions';
 
 export default function App() {
-  const { user, loading: authLoading, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [transactionsList, setTransactionsList] = useState([]);
@@ -22,12 +19,10 @@ export default function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
-
     async function loadTransactions() {
       try {
         setLoading(true);
-        const data = await fetchTransactions(user.id);
+        const data = await fetchTransactions();
         setTransactionsList(data);
         setError(null);
       } catch (err) {
@@ -38,11 +33,11 @@ export default function App() {
       }
     }
     loadTransactions();
-  }, [user]);
+  }, []);
 
   const addTransaction = async (newTx) => {
     try {
-      const saved = await createTransaction(user.id, newTx);
+      const saved = await createTransaction(newTx);
       setTransactionsList([saved, ...transactionsList]);
     } catch (err) {
       console.error('Failed to add transaction:', err);
@@ -52,27 +47,13 @@ export default function App() {
 
   const removeTransaction = async (id) => {
     try {
-      await deleteTransaction(user.id, id);
+      await deleteTransaction(id);
       setTransactionsList(transactionsList.filter(tx => tx.id !== id));
     } catch (err) {
       console.error('Failed to delete transaction:', err);
       setError('Could not delete transaction. Please try again.');
     }
   };
-
-  // Still checking whether a session exists
-  if (authLoading) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center font-mono text-xs" style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-muted)' }}>
-        Loading...
-      </div>
-    );
-  }
-
-  // No logged-in user - show the login/signup screen
-  if (!user) {
-    return <Login />;
-  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden" style={{ backgroundColor: 'var(--bg-main)', color: 'var(--text-main)' }}>
@@ -107,14 +88,6 @@ export default function App() {
             <NotificationCenter />
             <ThemeToggle />
             <ExportButton />
-            <button
-              onClick={signOut}
-              className="px-3 py-2 rounded-xl border font-mono text-xs cursor-pointer hover:bg-[#f87171]/10 hover:text-[#f87171] transition-colors"
-              style={{ borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
-              title="Log out"
-            >
-              Log Out
-            </button>
           </div>
         </header>
 
@@ -130,8 +103,8 @@ export default function App() {
             <>
               {activeTab === 'dashboard' && <Dashboard transactions={transactionsList} />}
               {activeTab === 'transactions' && <Transactions transactions={transactionsList} onAddTransaction={addTransaction} onDeleteTransaction={removeTransaction} />}
-              {activeTab === 'budgets' && <Budgets userId={user.id} />}
-              {activeTab === 'insights' && <Insights userId={user.id} />}
+              {activeTab === 'budgets' && <Budgets />}
+              {activeTab === 'insights' && <Insights />}
             </>
           )}
         </main>
