@@ -1,14 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 export default function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef(null);
+
   const alerts = [
     { id: 1, text: 'Shopping & Leisure budget exceeded by ₹500.', time: '10m ago' },
-    { id: 2, text: 'New recurring SaaS subscription detected.', time: '2h ago' }
+    { id: 2, text: 'New recurring subscription detected.', time: '2h ago' }
   ];
 
+  // Close the dropdown when clicking/tapping anywhere outside it
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <div className="relative font-sans">
+    <div className="relative font-sans" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-xl border transition-all cursor-pointer relative"
