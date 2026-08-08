@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Sidebar({ activeTab, setActiveTab }) {
+export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }) {
   const menuItems = [
     { 
       id: 'dashboard', 
@@ -47,44 +47,72 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     },
   ];
 
-  return (
-    <aside 
-      className="w-64 border-r flex flex-col justify-between p-6 transition-colors duration-200"
-      style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-color)' }}
-    >
-      <div>
-        <div className="flex items-center gap-3 mb-10">
-          <div className="w-9 h-9 rounded-lg bg-[#34d399]/10 border border-[#34d399]/30 flex items-center justify-center text-[#34d399] font-serif font-bold text-lg">
-            ₹
-          </div>
-          <div>
-            <h1 className="font-serif font-bold text-lg tracking-wide" style={{ color: 'var(--text-main)' }}>FinSight</h1>
-            <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>receipt aesthetic</p>
-          </div>
-        </div>
+  const handleSelect = (id) => {
+    setActiveTab(id);
+    onClose?.(); // close the drawer automatically after picking a tab on mobile
+  };
 
-        <nav className="space-y-2">
-          {menuItems.map((item) => {
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-[#34d399]/10 text-[#34d399] border border-[#34d399]/20 shadow-sm'
-                    : 'hover:opacity-80'
-                }`}
-                style={{ color: isActive ? '#34d399' : 'var(--text-muted)' }}
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-      
-    </aside>
+  return (
+    <>
+      {/* Backdrop - only shows on mobile when drawer is open */}
+      {isOpen && (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+        />
+      )}
+
+      <aside
+        className={`
+          fixed lg:static top-0 left-0 h-full w-64 border-r flex flex-col justify-between p-6
+          transition-transform duration-200 z-50
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0
+        `}
+        style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-color)' }}
+      >
+        <div>
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-[#34d399]/10 border border-[#34d399]/30 flex items-center justify-center text-[#34d399] font-serif font-bold text-lg">
+                ₹
+              </div>
+              <div>
+                <h1 className="font-serif font-bold text-lg tracking-wide" style={{ color: 'var(--text-main)' }}>FinSight</h1>
+                <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>receipt aesthetic</p>
+              </div>
+            </div>
+            {/* Close button - mobile only */}
+            <button
+              onClick={onClose}
+              className="lg:hidden w-8 h-8 rounded-lg border flex items-center justify-center cursor-pointer"
+              style={{ borderColor: 'var(--border-color)', color: 'var(--text-main)' }}
+            >
+              ✕
+            </button>
+          </div>
+
+          <nav className="space-y-2">
+            {menuItems.map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleSelect(item.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#34d399]/10 text-[#34d399] border border-[#34d399]/20 shadow-sm'
+                      : 'hover:opacity-80'
+                  }`}
+                  style={{ color: isActive ? '#34d399' : 'var(--text-muted)' }}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      </aside>
+    </>
   );
 }
