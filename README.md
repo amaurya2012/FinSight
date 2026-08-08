@@ -20,6 +20,7 @@ Built as a data-science-forward portfolio project combining a **React frontend**
 - **Budgets** — Set monthly spending limits per category, track real-time progress against actual spend, and delete budgets.
 - **Insights** — Live ML-driven cards for next month's predicted spend, month-over-month trend direction, and flagged anomalies.
 - **Wallet Selector, Notifications, Theme Toggle, Export** — supporting UI for a complete dashboard experience.
+- **Mobile Responsive** — collapsible sidebar drawer and adaptive layout for smaller screens.
 - **Secure by Design** — Row Level Security (RLS) enforced at the database level so users can only ever access their own data.
 
 ---
@@ -257,11 +258,10 @@ All tables have **Row Level Security (RLS)** enabled, ensuring each user can onl
 - Category-aware anomaly detection (separate thresholds per category)
 - Exclude in-progress months from trend-based predictions
 - Recurring transaction detection (auto-flag subscriptions, rent)
-- Mobile-responsive UI polish
 - CSV/bank statement import
 
 ---
 
 ## 👩‍💻 Author
 
-Built by Ajeyata Maurya
+Built by Ajeyata Maurya 
