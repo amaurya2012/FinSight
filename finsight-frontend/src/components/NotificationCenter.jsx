@@ -24,7 +24,7 @@ export default function NotificationCenter() {
 
       {isOpen && (
         <div 
-          className="absolute right-0 mt-2 w-80 border rounded-2xl shadow-2xl p-4 z-50 font-mono transition-colors"
+          className="absolute right-0 mt-2 w-72 max-w-[85vw] border rounded-2xl shadow-2xl p-4 z-50 font-mono transition-colors"
           style={{ 
             backgroundColor: 'var(--bg-surface)', 
             borderColor: 'var(--border-color)' 
